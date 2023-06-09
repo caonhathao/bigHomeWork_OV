@@ -234,6 +234,11 @@ int main() {
 			if (virtualMode == true) {
 				for (int i = 0; i < amount; i++)
 				{
+					/*
+					(*maxLen * 2)*curCol: length of cell
+					20: position of matrix
+					1 + to_sttring(num).size(): set positino of text pointer
+					*/
 					drawX = (*maxLen + 3) * (robotP[i].curPosX + 1) + 20 - (1 + to_string(store[i][0]).size());
 					drawY = 2 * robotP[i].curPosY + 1 + 3 + amount;
 					markCell(drawX,drawY, i + 1, store[i][0]);
@@ -263,7 +268,7 @@ int main() {
 
 							if (virtualMode == true)
 							{
-								drawX = (*maxLen + 3) * (robotP[i].curPosX + 1) + 20 - (1 + to_string(store[i][0]).size());
+								drawX = (*maxLen + 3) * (robotP[i].curPosX + 1) + 20 - (1 + to_string(temp.value).size());
 								drawY = 2 * robotP[i].curPosY + 1 + 3 + amount;
 								markCell(drawX, drawY, i + 1, temp.value);
 							};
@@ -278,7 +283,10 @@ int main() {
 				{
 					break;
 				}
-				Sleep(200);
+				if (virtualMode == true)
+				{
+					Sleep(200);
+				};
 			};
 
 			for (int i = 0; i < amount; i++)
@@ -290,6 +298,7 @@ int main() {
 				};
 				fileOutput << '\n';
 			};
+			fileOutput.close();
 
 			cout << '\n';
 			gotoXY(0, 2 * sizeMatrix[0] + 1 + 3 + amount);
