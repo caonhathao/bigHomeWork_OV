@@ -186,6 +186,7 @@ int main() {
 	}
 
 	bool virtualMode = false;
+	bool createMap = false;
 
 	int drawX = 0;
 	int drawY = 0;
@@ -203,6 +204,11 @@ int main() {
 			}
 		};
 
+		if (createMap==true)
+		{
+			/*create new map*/
+			createMap = false;
+		}
 		switch (playerChoice())
 		{
 		case 1: {
@@ -218,7 +224,7 @@ int main() {
 			for (int i = 0; i < amount; i++)
 			{
 				gotoXY(0, i + 1);
-				setColor(0, 7);
+				
 				cout << "Nhap toa do cua robot [" << i << "] :";
 				cin >> robotP[i].curPosX >> robotP[i].curPosY;
 
@@ -366,13 +372,16 @@ int main() {
 			for (int i = 0; i < sizeMatrix[0]; i++)
 			{
 				delete[] arrFlag[i];
-			}
+			};
 			delete[] arrFlag;
+
 			for (int i = 0; i < sizeMatrix[0]; i++)
 			{
 				delete[]  arr[i];
-			}delete[] arr;
-			posElement** arr = makeNewMap(sizeMatrix[0], sizeMatrix[1], *maxLen);
+			};
+			delete[] arr;
+			
+			createMap = true;
 			break;
 		}
 		default:
