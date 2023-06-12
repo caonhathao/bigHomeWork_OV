@@ -351,21 +351,24 @@ int main() {
 			cout << '\n';
 			cout << "press 'b' to back!";
 			char* c = new char(' ');
-			while (_kbhit()) {
-				*c = _getch();
-				*c = tolower(*c);
-
-				if (*c == 'b')
+			while (true) {
+				if (_kbhit())
 				{
-					delete c;
-					break;
-				}
-				else
-				{
-					delete c;
-					goto exit;
-				}
+					*c = _getch();
+					*c = tolower(*c);
+					if (*c == 'b')
+					{
+						delete c;
+						break;
+					}
+					else
+					{
+						delete c;
+						goto exit;
+					}
+				};
 			};
+			break;
 		}
 		case 4: {
 			for (int i = 0; i < sizeMatrix[0]; i++)

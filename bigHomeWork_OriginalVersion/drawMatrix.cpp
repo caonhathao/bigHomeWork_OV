@@ -17,7 +17,7 @@ void drawMatrix(posElement** arr, int row, int col, int maxLen, int posX, int po
 		{
 			for (int j = 0; j < ((maxLen * 2) * col) + 1; j++)
 			{
-				if (j % 6 == 0)
+				if (j % (3 + maxLen) == 0)
 				{
 					cout << '+';
 				}
