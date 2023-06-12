@@ -38,12 +38,12 @@ int sizeMatrix[2] = {}; //[0]=row and [1]=cloumn
 #pragma region funcsEvent
 int playerChoice();//giao dien lua chon
 
-void existAndPush(posRobot robot, int** arrFlag, posElement** arr, int& step);//kiem tra neu phan tu ton tai thi dua vao dien xem xet
-void drawMatrix(posElement** arr, int row, int col, int maxLen, int posX, int posY);//ve bang
-void markCell(int posX, int posY, int colorCode, int num);// danh dau nhung o di vao
+void existAndPush(posRobot robot, int** arrFlag, posElement** arr, int& step);
+void drawMatrix(posElement** arr, int row, int col, int maxLen, int posX, int posY);
+void markCell(int posX, int posY, int colorCode, int num);
 posElement** makeNewMap(int& row, int& col,int &maxlen);
 
-bool isElementExist(int i, int j);//phann tu co ton tai hay khong [kiem tra robot da cham bien hay chua]
+bool isElementExist(int i, int j);
 bool isStop(posRobot robot[], int& size);
 
 posElement nextStep(posElement a[4], int size);
@@ -127,7 +127,6 @@ posElement nextStep(posElement a[4], int size) {
 	return max;
 }
 
-//show,create or delete matrix (map)
 void showMap(int* arr, int m, int n) {
 	for (int i = 0; i < m; i++)
 	{
@@ -194,7 +193,7 @@ int main() {
 	while(true){
 		system("cls");
 
-		int** arrFlag = new int* [sizeMatrix[0]]; //ma tran danh dau
+		int** arrFlag = new int* [sizeMatrix[0]]; 
 		for (int i = 0; i < sizeMatrix[0]; i++)
 		{
 			arrFlag[i] = new int[sizeMatrix[1]];
