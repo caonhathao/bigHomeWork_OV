@@ -25,9 +25,9 @@ using std::to_string;
 using std::vector;
 
 struct posRobot {
+	bool stop = false;
 	int curPosX = 0;
 	int curPosY = 0;
-	bool stop = false;
 	int amountCell = 1;
 };
 
@@ -177,6 +177,7 @@ int main() {
 			}
 		}
 	}
+	fileInput.close();
 
 	ofstream fileOutput("C:/Users/Lenovo/Desktop/output.txt");
 	if (fileOutput.fail())
@@ -203,11 +204,14 @@ int main() {
 			}
 		};
 
-		if (createMap==true)
+		if (createMap == true)
 		{
-			/*create new map*/
+			posElement** arr;
+			arr = makeNewMap(sizeMatrix[0], sizeMatrix[1], *maxLen);
 			createMap = false;
 		}
+
+		system("cls");
 		switch (playerChoice())
 		{
 		case 1: {
