@@ -25,11 +25,12 @@ posElement** makeNewMap(int& row, int& col, int& maxLen) {
 			arr[i][j].posX = j;
 			arr[i][j].posY = i;
 			temp = to_string(arr[i][j].value).size();
-			if (temp > maxLen)
+			if (temp >= maxLen)
 			{
 				maxLen = temp;
 			};
 		}
 	};
+	system("pause");
 	return arr;
 };
