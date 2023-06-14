@@ -41,7 +41,7 @@ int playerChoice();//giao dien lua chon
 void existAndPush(posRobot robot, int** arrFlag, posElement** arr, int& step);
 void drawMatrix(posElement** arr, int row, int col, int maxLen, int posX, int posY);
 void markCell(int posX, int posY, int colorCode, int num);
-posElement** makeNewMap(int& row, int& col,int &maxlen);
+//posElement** makeNewMap(int& row, int& col,int &maxlen);
 
 bool isElementExist(int i, int j);
 bool isStop(posRobot robot[], int& size);
@@ -192,7 +192,33 @@ int main() {
 	int drawY = 0;
 
 	while(true){
-		system("cls");
+		if (createMap == true)
+		{
+			system("cls");
+			cout << "Nhap kich thuoc moi cua map (hang, cot): ";
+			cin >> sizeMatrix[0] >> sizeMatrix[1];
+
+			int temp = 0;
+			*maxLen = 0;
+
+			posElement** arr = new posElement * [sizeMatrix[0]];
+			for (int i = 0; i < sizeMatrix[0]; i++)
+			{
+				arr[i] = new posElement[sizeMatrix[1]];
+				for (int j = 0; j < sizeMatrix[1]; j++)
+				{
+					arr[i][j].value = 0;
+					arr[i][j].posX = j;
+					arr[i][j].posY = i;
+					temp = to_string(arr[i][j].value).size();
+					if (temp >= *maxLen)
+					{
+						*maxLen = temp;
+					};
+				}
+			};
+			createMap = false;
+		}
 
 		int** arrFlag = new int* [sizeMatrix[0]]; 
 		for (int i = 0; i < sizeMatrix[0]; i++)
@@ -203,14 +229,6 @@ int main() {
 				arrFlag[i][j] = 0;
 			}
 		};
-
-		if (createMap == true)
-		{
-			posElement** arr;
-			arr = makeNewMap(sizeMatrix[0], sizeMatrix[1], *maxLen);
-			cout << &arr;
-			createMap = false;
-		}
 
 		system("cls");
 		switch (playerChoice())
