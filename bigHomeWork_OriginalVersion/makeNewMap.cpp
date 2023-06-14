@@ -15,7 +15,7 @@ posElement** makeNewMap(int& row, int& col, int& maxLen) {
 	int temp = 0;
 	maxLen = 0;
 
-	posElement** arr = new posElement * [row];
+	static posElement** arr = new posElement * [row];
 	for (int i = 0; i < row; i++)
 	{
 		arr[i] = new posElement[col];
@@ -31,6 +31,7 @@ posElement** makeNewMap(int& row, int& col, int& maxLen) {
 			};
 		}
 	};
+	cout << &arr;
 	system("pause");
 	return arr;
 };
