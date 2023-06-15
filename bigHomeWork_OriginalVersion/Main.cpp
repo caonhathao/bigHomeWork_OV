@@ -133,9 +133,11 @@ int main() {
 	bool defaultMap = true;
 	int* maxLen = new int(0);
 
-	ofstream fileOutput("C:/Users/Lenovo/Desktop/output.txt");
+	fstream fileOutput;
 
 	while (true) {
+		setColor(0, 7);
+
 		posElement** arr = NULL;
 		int drawX = 0;
 		int drawY = 0;
@@ -218,17 +220,17 @@ int main() {
 			createMap = false;
 		}
 
-		int** arrFlag = new int* [sizeMatrix[0]];
-		for (int i = 0; i < sizeMatrix[0]; i++)
-		{
-			arrFlag[i] = new int[sizeMatrix[1]];
-			for (int j = 0; j < sizeMatrix[1]; j++)
-			{
-				arrFlag[i][j] = 0;
-			}
-		};
-
 		while (true) {
+			int** arrFlag = new int* [sizeMatrix[0]];
+			for (int i = 0; i < sizeMatrix[0]; i++)
+			{
+				arrFlag[i] = new int[sizeMatrix[1]];
+				for (int j = 0; j < sizeMatrix[1]; j++)
+				{
+					arrFlag[i][j] = 0;
+				}
+			};
+
 			system("cls");
 			switch (playerChoice())
 			{
@@ -316,6 +318,7 @@ int main() {
 					};
 				};
 
+				fileOutput.open("C:/Users/Lenovo/Desktop/output.txt");
 				for (int i = 0; i < amount; i++)
 				{
 					fileOutput << robotP[i].amountCell << '\n';
