@@ -27,12 +27,13 @@
     <ClCompile Include="markCell.cpp" />
     <ClCompile Include="playerChoice.cpp" />
     <ClCompile Include="testing.cpp" />
-    <ClCompile Include="valGobal.cpp" />
+    <ClCompile Include="valGlobal.cpp" />
     <ClCompile Include="welScreen.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="control_console.h" />
     <ClInclude Include="effects.h" />
+    <ClInclude Include="valGlobal.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

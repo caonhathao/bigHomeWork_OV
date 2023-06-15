@@ -4,9 +4,9 @@ tuy vao so luong nguoi choi se cho mau khac nhau
 
 #include<iostream>
 #include"control_console.h"
-using std::cout;
-void markCell(int posX, int posY, int colorCode, int num) {
+
+void markCell(int posX, int posY, string colorCode, int num) {
 	gotoXY(posX, posY);
-	setColor(0, colorCode);
+	setTextColor(colorCode);
 	cout << num;
 }

@@ -1,9 +1,10 @@
-/*thuat toan tim kiem o lon nhat cho buoc di ke tiep
-* doc, ghi du lieu
-* thuat toan voi 2 rot bot o hai vi tri khac nhau
-* toa do robot: hoi nguoi dung
+/*Greedy Robot
+*Find the way which will be next step for robot (player) go.
+* Looking for cells around the robot
+* If no one went on them, save them and compare them
+* when we find a max cell, control robot go to that cell
+* continue untill we cannot find any cells may be a next step or no way to go.
 */
-
 
 #include<iostream>
 #include<fstream>
@@ -11,10 +12,12 @@
 #include<string>
 #include<conio.h>
 #include<Windows.h>
+#include<random>
 
-#include"valGobal.cpp"
+#include"valGlobal.h"
 #include"control_console.h"
 
+#pragma region	namespaceVersion	
 using std::cout;
 using std::cin;
 using std::fstream;
@@ -23,13 +26,7 @@ using std::ifstream;
 using std::string;
 using std::to_string;
 using std::vector;
-
-struct posRobot {
-	bool stop = false;
-	int curPosX = 0;
-	int curPosY = 0;
-	int amountCell = 1;
-};
+#pragma endregion
 
 posRobot robot;
 posElement infoStep[4] = { 0 };
@@ -40,7 +37,7 @@ int playerChoice();//giao dien lua chon
 
 void existAndPush(posRobot robot, int** arrFlag, posElement** arr, int& step);
 void drawMatrix(posElement** arr, int row, int col, int maxLen, int posX, int posY);
-void markCell(int posX, int posY, int colorCode, int num);
+void markCell(int posX, int posY, string colorCode, int num);
 //posElement** makeNewMap(int& row, int& col,int &maxlen);
 
 bool isElementExist(int i, int j);
@@ -49,7 +46,7 @@ bool isStop(posRobot robot[], int& size);
 posElement nextStep(posElement a[4], int size);
 #pragma endregion
 
-#pragma region funcsDeclare
+#pragma region funcsFindWay
 void existAndPush(posRobot robot, int** arrFlag, posElement** arr, int& step) {
 	if (isElementExist(robot.curPosY - 1, robot.curPosX)) //up
 	{
@@ -85,6 +82,21 @@ void existAndPush(posRobot robot, int** arrFlag, posElement** arr, int& step) {
 		}
 	}
 };
+posElement nextStep(posElement a[4], int size) {
+	posElement max = { 0,0,0 };
+	for (int i = 0; i < size; i++)
+	{
+		if (max.value <= a[i].value)
+		{
+			max = a[i];
+		}
+	};
+
+	return max;
+};
+#pragma endregion
+
+#pragma region funsCheckEvent
 bool isElementExist(int posY, int posX) {
 	if (posY == -1 || posY == sizeMatrix[0])
 	{
@@ -114,18 +126,21 @@ bool isStop(posRobot robot[], int& size) {
 	};
 	return false;
 }
-posElement nextStep(posElement a[4], int size) {
-	posElement max = { 0,0,0 };
-	for (int i = 0; i < size; i++)
-	{
-		if (max.value <= a[i].value)
-		{
-			max = a[i];
-		}
-	};
+#pragma endregion
 
-	return max;
+#pragma region funsTool
+size_t generateRandNum() {
+	// Create a seed to send value to engine
+	std::random_device rand;
+	// Take the seed value as an argument
+	std::mt19937 generate(rand()); // Mersenne Twister engine
+
+	const int MAX = 1000;
+
+	std::uniform_int_distribution<> dist(1, MAX);
+	return dist(generate);
 }
+#pragma endregion
 
 int main() {
 	bool virtualMode = false;
@@ -136,7 +151,7 @@ int main() {
 	fstream fileOutput;
 
 	while (true) {
-		setColor(0, 7);
+		setTextColor(RESET_COLOR);
 
 		posElement** arr = NULL;
 		int drawX = 0;
@@ -207,7 +222,7 @@ int main() {
 				arr[i] = new posElement[sizeMatrix[1]];
 				for (int j = 0; j < sizeMatrix[1]; j++)
 				{
-					arr[i][j].value = 0;
+					arr[i][j].value = generateRandNum();
 					arr[i][j].posX = j;
 					arr[i][j].posY = i;
 					temp = to_string(arr[i][j].value).size();
@@ -248,7 +263,7 @@ int main() {
 				{
 					gotoXY(0, i + 1);
 
-					cout << "Nhap toa do cua robot [" << i << "] :";
+					cout << "Nhap toa do cua robot [" << i << "] :" << '(' << sizeMatrix[0] << 'x' << sizeMatrix[1] << ')';
 					cin >> robotP[i].curPosX >> robotP[i].curPosY;
 
 					*val = arr[robotP[i].curPosY][robotP[i].curPosX].value;
@@ -270,7 +285,9 @@ int main() {
 						*/
 						drawX = (*maxLen + 3) * (robotP[i].curPosX + 1) + 20 - (1 + to_string(store[i][0]).size());
 						drawY = 2 * robotP[i].curPosY + 1 + 3 + amount;
-						markCell(drawX, drawY, i + 1, store[i][0]);
+
+						string colorCode = "\033[3" + to_string(i + 1) + "m";
+						markCell(drawX, drawY, colorCode, store[i][0]);
 					}
 				};
 
@@ -299,7 +316,9 @@ int main() {
 								{
 									drawX = (*maxLen + 3) * (robotP[i].curPosX + 1) + 20 - (1 + to_string(temp.value).size());
 									drawY = 2 * robotP[i].curPosY + 1 + 3 + amount;
-									markCell(drawX, drawY, i + 1, temp.value);
+
+									string colorCode = "\033[3" + to_string(i + 1) + "m";
+									markCell(drawX, drawY, colorCode, temp.value);
 								};
 							}
 							else
@@ -321,7 +340,7 @@ int main() {
 				fileOutput.open("C:/Users/Lenovo/Desktop/output.txt");
 				for (int i = 0; i < amount; i++)
 				{
-					fileOutput << robotP[i].amountCell << '\n';
+					fileOutput << "Robot [" << i << ']' << robotP[i].amountCell << '\n';
 					for (int j = 0; j < store[i].size(); j++)
 					{
 						fileOutput << store[i][j] << ' ';

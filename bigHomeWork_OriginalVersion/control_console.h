@@ -4,10 +4,16 @@
 #define _CONTROL_CONSOLE_H // !_CONTROL_CONSOLE_H
 
 #include<Windows.h>
+#include<iostream>	
+
+using std::string;
+using std::cout;
 
 void gotoXY(SHORT posX, SHORT posY);
 void showCursor(bool cursorVisibility);
-void setColor(int background_color, int text_color);
+void setTextColor(const string& color);
+
+//void setColor(int background_color, int text_color);
 
 /*
 0 = Black
@@ -42,5 +48,5 @@ void setColor(int background_color, int text_color);
 
 15 = Bright White
 */
-int random(int minN, int maxN);
+//int random(int minN, int maxN);
 #endif

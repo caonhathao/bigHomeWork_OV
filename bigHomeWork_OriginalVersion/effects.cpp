@@ -4,9 +4,9 @@
 
 using std::cout;
 
-void printAndFill(int posX, int posY, int colorCode, string str) {
+void printAndFill(int posX, int posY, string colorCode, string str) {
 	gotoXY(posX, posY);
-	setColor(0, colorCode);
+	setTextColor(colorCode);
 	for (int i = 0; i < str.size(); i++)
 	{
 		cout << str[i];

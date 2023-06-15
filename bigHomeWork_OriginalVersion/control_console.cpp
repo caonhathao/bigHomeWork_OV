@@ -15,12 +15,15 @@ void showCursor(bool cursorVisibility) {
 
 	SetConsoleCursorInfo(handle, &ConCurInf);
 }
-void setColor(int background_color, int text_color) {
-	HANDLE hStdout = GetStdHandle(STD_OUTPUT_HANDLE);
-	int color_code = background_color * 16 + text_color;
-	SetConsoleTextAttribute(hStdout, color_code);
-};	
-int random(int minN, int maxN) {
-	return minN + rand() % (maxN + 1 - minN);
-
+void setTextColor(const string& color) {
+	cout << color;
 }
+//void setColor(int background_color, int text_color) {
+//	HANDLE hStdout = GetStdHandle(STD_OUTPUT_HANDLE);
+//	int color_code = background_color * 16 + text_color;
+//	SetConsoleTextAttribute(hStdout, color_code);
+//};	
+//int random(int minN, int maxN) {
+//	return minN + rand() % (maxN + 1 - minN);
+//
+//}

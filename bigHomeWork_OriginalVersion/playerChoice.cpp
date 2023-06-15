@@ -1,30 +1,49 @@
 #include<iostream>
 #include"control_console.h"
+#include"valGlobal.h"
 
+#pragma region namespaceVersion
 using std::cout;
 using std::cin;
+using std::string;
+#pragma endregion
 
 void drawBoard() {
 	for (int i = 1; i < 100; i++)
 	{
 		gotoXY(i + 38, 3);
+		if (i % 2 == 0) setTextColor(RED_COLOR);
+		else setTextColor(YELLOW_COLOR);
 		cout << '_';
+		Sleep(5);
 	};
 	for (int i = 1; i < 16; i++)
 	{
 		gotoXY(38, i + 3);
+		if (i % 2 == 0) setTextColor(RED_COLOR);
+		else setTextColor(YELLOW_COLOR);
 		cout << 'T';
+
+		if (i % 2 == 0) setTextColor(RED_COLOR);
+		else setTextColor(YELLOW_COLOR);
 		gotoXY(138, i + 3);
 		cout << 'T';
+
+		Sleep(5);
 	}
 	for (int i = 1; i < 100; i++)
 	{
 		gotoXY(i + 38, 18);
+		if (i % 2 == 0) setTextColor(RED_COLOR);
+		else setTextColor(YELLOW_COLOR);
 		cout << '_';
+
+		Sleep(5);
 	}
 }
 int playerChoice() {
 	gotoXY(80, 1);
+	setTextColor(RESET_COLOR);
 	
 	cout << "_GREEDY_ROBOT_S";
 
