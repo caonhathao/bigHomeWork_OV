@@ -127,71 +127,69 @@ posElement nextStep(posElement a[4], int size) {
 	return max;
 }
 
-void showMap(int* arr, int m, int n) {
-	for (int i = 0; i < m; i++)
-	{
-		for (int j = 0; j < n; j++)
-		{
-			cout << arr[i * n + j] << ' ';
-		}
-		cout << '\n';
-	}
-};
 int main() {
-	ifstream fileInput("C:/Users/Lenovo/Desktop/input.txt");
-
-	int i = 0, j = 0;
-
-	for (int i = 0; i < 2; i++)
-	{
-		int num = 0;
-		if (fileInput >> num)
-		{
-			sizeMatrix[i] = num;
-		}
-	}
-
-	posElement** arr = new posElement * [sizeMatrix[0]];
-	int* maxLen = new int(0);
-	for (int i = 0; i < sizeMatrix[0]; i++)
-	{
-		arr[i] = new posElement[sizeMatrix[1]];
-	};
-
-	for (int i = 0; i < sizeMatrix[0]; i++)
-	{
-		for (int j = 0; j < sizeMatrix[1]; j++)
-		{
-			int num;
-			if (fileInput >> num)
-			{
-				arr[i][j].value = num;
-				arr[i][j].posX = j;
-				arr[i][j].posY = i;
-
-				int temp = to_string(arr[i][j].value).size();
-				if (temp > *maxLen)
-				{
-					*maxLen = temp;
-				};
-			}
-		}
-	}
-	fileInput.close();
-
-	ofstream fileOutput("C:/Users/Lenovo/Desktop/output.txt");
-	if (fileOutput.fail())
-	{
-		cout << "Can not open this file";
-	}
-
 	bool virtualMode = false;
 	bool createMap = false;
+	bool defaultMap = true;
+	int* maxLen = new int(0);
 
-	int drawX = 0;
-	int drawY = 0;
+	ofstream fileOutput("C:/Users/Lenovo/Desktop/output.txt");
 
-	while(true){
+	while (true) {
+		posElement** arr = NULL;
+		int drawX = 0;
+		int drawY = 0;
+		if (defaultMap == true)
+		{
+			ifstream fileInput("C:/Users/Lenovo/Desktop/input.txt");
+
+			int i = 0, j = 0;
+
+			for (int i = 0; i < 2; i++)
+			{
+				int num = 0;
+				if (fileInput >> num)
+				{
+					sizeMatrix[i] = num;
+				}
+			}
+
+			arr = new posElement * [sizeMatrix[0]];
+
+			for (int i = 0; i < sizeMatrix[0]; i++)
+			{
+				arr[i] = new posElement[sizeMatrix[1]];
+			};
+
+			for (int i = 0; i < sizeMatrix[0]; i++)
+			{
+				for (int j = 0; j < sizeMatrix[1]; j++)
+				{
+					int num;
+					if (fileInput >> num)
+					{
+						arr[i][j].value = num;
+						arr[i][j].posX = j;
+						arr[i][j].posY = i;
+
+						int temp = to_string(arr[i][j].value).size();
+						if (temp > *maxLen)
+						{
+							*maxLen = temp;
+						};
+					}
+				}
+			}
+			fileInput.close();
+
+			if (fileOutput.fail())
+			{
+				cout << "Can not open this file";
+			}
+			defaultMap = false;
+		}
+
+		createNewMap:
 		if (createMap == true)
 		{
 			system("cls");
@@ -201,7 +199,7 @@ int main() {
 			int temp = 0;
 			*maxLen = 0;
 
-			posElement** arr = new posElement * [sizeMatrix[0]];
+			arr = new posElement * [sizeMatrix[0]];
 			for (int i = 0; i < sizeMatrix[0]; i++)
 			{
 				arr[i] = new posElement[sizeMatrix[1]];
@@ -220,7 +218,7 @@ int main() {
 			createMap = false;
 		}
 
-		int** arrFlag = new int* [sizeMatrix[0]]; 
+		int** arrFlag = new int* [sizeMatrix[0]];
 		for (int i = 0; i < sizeMatrix[0]; i++)
 		{
 			arrFlag[i] = new int[sizeMatrix[1]];
@@ -230,188 +228,195 @@ int main() {
 			}
 		};
 
-		system("cls");
-		switch (playerChoice())
-		{
-		case 1: {
+		while (true) {
 			system("cls");
-			cout << "Xac nhan so nguoi choi:";
-			int amount;
-			cin >> amount;
-
-			posRobot* robotP = new posRobot[amount]{};
-			vector<int>* store = new vector<int>[amount] {};
-
-			int* val = new int(0);
-			for (int i = 0; i < amount; i++)
+			switch (playerChoice())
 			{
-				gotoXY(0, i + 1);
-				
-				cout << "Nhap toa do cua robot [" << i << "] :";
-				cin >> robotP[i].curPosX >> robotP[i].curPosY;
+			case 1: {
+				system("cls");
+				cout << "Xac nhan so nguoi choi:";
+				int amount = 0;
+				cin >> amount;
 
-				*val = arr[robotP[i].curPosY][robotP[i].curPosX].value;
-				arrFlag[robotP[i].curPosY][robotP[i].curPosX] = i + 1;
+				posRobot* robotP = new posRobot[amount]{};
+				vector<int>* store = new vector<int>[amount] {};
 
-				store[i].push_back(*val);
-			};
-			delete val;
-
-			drawMatrix(arr, sizeMatrix[0], sizeMatrix[1], *maxLen, 20, 3 + amount);
-
-			if (virtualMode == true) {
+				int* val = new int(0);
 				for (int i = 0; i < amount; i++)
 				{
-					/*
-					(*maxLen * 2)*curCol: length of cell
-					20: position of matrix
-					1 + to_sttring(num).size(): set positino of text pointer
-					*/
-					drawX = (*maxLen + 3) * (robotP[i].curPosX + 1) + 20 - (1 + to_string(store[i][0]).size());
-					drawY = 2 * robotP[i].curPosY + 1 + 3 + amount;
-					markCell(drawX,drawY, i + 1, store[i][0]);
-				}
-			};
+					gotoXY(0, i + 1);
 
-			while (true)
-			{
-				bool signal = isStop(robotP, amount);
-				for (int i = 0; i < amount; i++)
-				{
-					if (robotP[i].stop != true)
+					cout << "Nhap toa do cua robot [" << i << "] :";
+					cin >> robotP[i].curPosX >> robotP[i].curPosY;
+
+					*val = arr[robotP[i].curPosY][robotP[i].curPosX].value;
+					arrFlag[robotP[i].curPosY][robotP[i].curPosX] = -1;
+
+					store[i].push_back(*val);
+				};
+				delete val;
+
+				drawMatrix(arr, sizeMatrix[0], sizeMatrix[1], *maxLen, 20, 3 + amount);
+
+				if (virtualMode == true) {
+					for (int i = 0; i < amount; i++)
 					{
-						int step = 0;
-						existAndPush(robotP[i], arrFlag, arr, step);
+						/*
+						(*maxLen * 2)*curCol: length of cell
+						20: position of matrix
+						1 + to_sttring(num).size(): set positino of text pointer
+						*/
+						drawX = (*maxLen + 3) * (robotP[i].curPosX + 1) + 20 - (1 + to_string(store[i][0]).size());
+						drawY = 2 * robotP[i].curPosY + 1 + 3 + amount;
+						markCell(drawX, drawY, i + 1, store[i][0]);
+					}
+				};
 
-						posElement temp = nextStep(infoStep, step);
-						if (temp.value != 0)
+				while (true)
+				{
+					bool signal = isStop(robotP, amount);
+					for (int i = 0; i < amount; i++)
+					{
+						if (robotP[i].stop != true)
 						{
-							robotP[i].curPosX = temp.posX;
-							robotP[i].curPosY = temp.posY;
+							int step = 0;
+							existAndPush(robotP[i], arrFlag, arr, step);
 
-							robotP[i].amountCell++;
-
-							store[i].push_back(arr[temp.posY][temp.posX].value);
-							arrFlag[robotP[i].curPosY][robotP[i].curPosX] = i + 1;
-
-							if (virtualMode == true)
+							posElement temp = nextStep(infoStep, step);
+							if (temp.value != 0)
 							{
-								drawX = (*maxLen + 3) * (robotP[i].curPosX + 1) + 20 - (1 + to_string(temp.value).size());
-								drawY = 2 * robotP[i].curPosY + 1 + 3 + amount;
-								markCell(drawX, drawY, i + 1, temp.value);
+								robotP[i].curPosX = temp.posX;
+								robotP[i].curPosY = temp.posY;
+
+								robotP[i].amountCell++;
+
+								store[i].push_back(arr[temp.posY][temp.posX].value);
+								arrFlag[robotP[i].curPosY][robotP[i].curPosX] = -1;
+
+								if (virtualMode == true)
+								{
+									drawX = (*maxLen + 3) * (robotP[i].curPosX + 1) + 20 - (1 + to_string(temp.value).size());
+									drawY = 2 * robotP[i].curPosY + 1 + 3 + amount;
+									markCell(drawX, drawY, i + 1, temp.value);
+								};
+							}
+							else
+							{
+								robotP[i].stop = true;
 							};
+						}
+					}
+					if (signal == true)
+					{
+						break;
+					}
+					if (virtualMode == true)
+					{
+						Sleep(200);
+					};
+				};
+
+				for (int i = 0; i < amount; i++)
+				{
+					fileOutput << robotP[i].amountCell << '\n';
+					for (int j = 0; j < store[i].size(); j++)
+					{
+						fileOutput << store[i][j] << ' ';
+					};
+					fileOutput << '\n';
+				};
+				fileOutput.close();
+
+				cout << '\n';
+				gotoXY(0, 2 * sizeMatrix[0] + 1 + 3 + amount);
+				cout << "Ban co muon choi lai khong (y/n): ";
+				char c = ' ';
+				cin >> c;
+				c = tolower(c);
+				if (c == 'y')
+				{
+					delete[]robotP;
+					delete[]store;
+
+					for (int i = 0; i < sizeMatrix[0]; i++)
+					{
+						delete[] arrFlag[i];
+					}
+					delete[] arrFlag;
+					break;
+				}
+				else
+				{
+					goto exit;
+				};
+			}
+			case 2: {
+				system("cls");
+				cout << "Che do mo phong:" << virtualMode << '\n';
+				char c = ' ';
+				if (!virtualMode)
+				{
+					cout << "Bat mo phong ?(y/n): ";
+				}
+				else cout << " Tat mo phong ?(y/n): ";
+				cin >> c;
+				c = tolower(c);
+				if (c == 'y')
+				{
+					virtualMode = !virtualMode;
+				};
+				break;
+			}
+			case 3: {
+				system("cls");
+				drawMatrix(arr, sizeMatrix[0], sizeMatrix[1], *maxLen, 20, 3);
+				cout << '\n';
+				cout << "press 'b' to back!";
+				char* c = new char(' ');
+				while (true) {
+					if (_kbhit())
+					{
+						*c = _getch();
+						*c = tolower(*c);
+						if (*c == 'b')
+						{
+							delete c;
+							break;
 						}
 						else
 						{
-							robotP[i].stop = true;
-						};
-					}
-				}
-				if (signal == true)
-				{
-					break;
-				}
-				if (virtualMode == true)
-				{
-					Sleep(200);
+							delete c;
+							goto exit;
+						}
+					};
 				};
-			};
-
-			for (int i = 0; i < amount; i++)
-			{
-				fileOutput << robotP[i].amountCell << '\n';
-				for (int j = 0; j < store[i].size(); j++)
-				{
-					fileOutput << store[i][j] << ' ';
-				};
-				fileOutput << '\n';
-			};
-			fileOutput.close();
-
-			cout << '\n';
-			gotoXY(0, 2 * sizeMatrix[0] + 1 + 3 + amount);
-			cout << "Ban co muon choi lai khong (y/n): ";
-			char c = ' ';
-			cin >> c;
-			c = tolower(c);
-			if (c == 'y')
-			{
-				delete[]robotP;
-				delete[]store;
-
+				break;
+			}
+			case 4: {
 				for (int i = 0; i < sizeMatrix[0]; i++)
 				{
 					delete[] arrFlag[i];
-				}
+				};
 				delete[] arrFlag;
+
+				for (int i = 0; i < sizeMatrix[0]; i++)
+				{
+					delete[]  arr[i];
+				};
+				delete[] arr;
+
+				createMap = true;
+				defaultMap = false;
+				goto createNewMap;
+			}
+			case 5: {
+				system("cls");
 				break;
 			}
-			else
-			{
-				goto exit;
-			};
-		}
-		case 2: {
-			system("cls");
-			cout << "Che do mo phong:" << virtualMode << '\n';
-			char c = ' ';
-			if (!virtualMode)
-			{
-				cout << "Bat mo phong ?(y/n): ";
+			default:
+				break;
 			}
-			else cout << " Tat mo phong ?(y/n): ";
-			cin >> c;
-			c = tolower(c);
-			if (c == 'y')
-			{
-				virtualMode = !virtualMode;
-			};
-			break;
-		}
-		case 3: {
-			system("cls");
-			drawMatrix(arr, sizeMatrix[0], sizeMatrix[1], *maxLen, 20, 3);
-			cout << '\n';
-			cout << "press 'b' to back!";
-			char* c = new char(' ');
-			while (true) {
-				if (_kbhit())
-				{
-					*c = _getch();
-					*c = tolower(*c);
-					if (*c == 'b')
-					{
-						delete c;
-						break;
-					}
-					else
-					{
-						delete c;
-						goto exit;
-					}
-				};
-			};
-			break;
-		}
-		case 4: {
-			for (int i = 0; i < sizeMatrix[0]; i++)
-			{
-				delete[] arrFlag[i];
-			};
-			delete[] arrFlag;
-
-			for (int i = 0; i < sizeMatrix[0]; i++)
-			{
-				delete[]  arr[i];
-			};
-			delete[] arr;
-			
-			createMap = true;
-			break;
-		}
-		default:
-			break;
-		}
+		};
 	};
 	exit:
 	return 0;

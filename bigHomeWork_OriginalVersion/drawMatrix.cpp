@@ -15,7 +15,7 @@ void drawMatrix(posElement** arr, int row, int col, int maxLen, int posX, int po
 
 		if (i % 2 == 0)
 		{
-			for (int j = 0; j < ((maxLen * 2) * col) + 1; j++)
+			for (int j = 0; j < ((maxLen + 3) * col) + 1; j++)
 			{
 				if (j % (3 + maxLen) == 0)
 				{
