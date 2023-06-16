@@ -1,7 +1,7 @@
 #include<iostream>
 #include<iomanip>
 #include"control_console.h"
-#include"valGobal.cpp"
+#include"valGlobal.h"
 
 using std::cout;
 using std::setw;

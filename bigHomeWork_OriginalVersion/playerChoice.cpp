@@ -15,7 +15,6 @@ void drawBoard() {
 		if (i % 2 == 0) setTextColor(RED_COLOR);
 		else setTextColor(YELLOW_COLOR);
 		cout << '_';
-		Sleep(5);
 	};
 	for (int i = 1; i < 16; i++)
 	{
@@ -28,8 +27,6 @@ void drawBoard() {
 		else setTextColor(YELLOW_COLOR);
 		gotoXY(138, i + 3);
 		cout << 'T';
-
-		Sleep(5);
 	}
 	for (int i = 1; i < 100; i++)
 	{
@@ -37,20 +34,22 @@ void drawBoard() {
 		if (i % 2 == 0) setTextColor(RED_COLOR);
 		else setTextColor(YELLOW_COLOR);
 		cout << '_';
-
-		Sleep(5);
 	}
 }
 int playerChoice() {
 	gotoXY(80, 1);
 	setTextColor(RESET_COLOR);
-	
-	cout << "_GREEDY_ROBOT_S";
+
+	setTextColor(CYAN_COLOR);
+	cout << "_GREEDY_ROBOT_S_";
 
 	drawBoard();
 
 	gotoXY(42, 5);
+	setTextColor(GREEN_COLOR);
 	cout << "Ban muon choi theo kieu nao?";
+
+	setTextColor(BLUE_COLOR);
 	gotoXY(44, 7);
 	cout << "1. Mot (nhieu) nguoi choi.";
 	gotoXY(44, 9);
@@ -62,11 +61,11 @@ int playerChoice() {
 	gotoXY(44, 15);
 	cout << "5. Huong dan choi.";
 
+	int choice;
+	setTextColor(MAGENTA_COLOR);
 	gotoXY(44, 17);
 	cout << ">> ";
-
-	int choice = 0;
 	cin >> choice;
-	
+
 	return choice;
-}
+};

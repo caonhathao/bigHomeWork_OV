@@ -32,7 +32,7 @@ posRobot robot;
 posElement infoStep[4] = { 0 };
 int sizeMatrix[2] = {}; //[0]=row and [1]=cloumn
 
-#pragma region funcsEvent
+#pragma region funcsDeclaration
 int playerChoice();//giao dien lua chon
 
 void existAndPush(posRobot robot, int** arrFlag, posElement** arr, int& step);
@@ -210,12 +210,15 @@ int main() {
 		if (createMap == true)
 		{
 			system("cls");
-			cout << "Nhap kich thuoc moi cua map (hang, cot): ";
+			setTextColor(GREEN_COLOR);
+			cout << "\tNhap kich thuoc moi cua map (hang, cot): ";
 			cin >> sizeMatrix[0] >> sizeMatrix[1];
 
 			int temp = 0;
 			*maxLen = 0;
 
+			cout << '\n';
+			cout << "\tDang tao moi..." << '\n';
 			arr = new posElement * [sizeMatrix[0]];
 			for (int i = 0; i < sizeMatrix[0]; i++)
 			{
@@ -233,7 +236,31 @@ int main() {
 				}
 			};
 			createMap = false;
-		}
+
+			cout << "\tDa tao xong" << '\n';
+			cout << '\n';
+
+			setTextColor(RED_COLOR);
+			cout << "\tpress 'b' to back!";
+			char* c = new char(' ');
+			while (true) {
+				if (_kbhit())
+				{
+					*c = _getch();
+					*c = tolower(*c);
+					if (*c == 'b')
+					{
+						delete c;
+						break;
+					}
+					else
+					{
+						delete c;
+						goto exit;
+					}
+				};
+			};
+		};
 
 		while (true) {
 			int** arrFlag = new int* [sizeMatrix[0]];
@@ -251,20 +278,34 @@ int main() {
 			{
 			case 1: {
 				system("cls");
-				cout << "Xac nhan so nguoi choi:";
+				setTextColor(YELLOW_COLOR);
+				cout << "\tXac nhan so nguoi choi: ";
 				int amount = 0;
 				cin >> amount;
 
 				posRobot* robotP = new posRobot[amount]{};
 				vector<int>* store = new vector<int>[amount] {};
 
+				setTextColor(GREEN_COLOR);
+				cout << "\tPlease enter the robot's position like as this form: [numRow][ ][numCol]" << '\n';
+				cout << "\tnumRow >= numCol >= 1" << '\n';
+
+				setTextColor(RESET_COLOR);
 				int* val = new int(0);
 				for (int i = 0; i < amount; i++)
 				{
-					gotoXY(0, i + 1);
+					gotoXY(0, i + 3);
 
-					cout << "Nhap toa do cua robot [" << i << "] :" << '(' << sizeMatrix[0] << 'x' << sizeMatrix[1] << ')';
-					cin >> robotP[i].curPosX >> robotP[i].curPosY;
+					string colorCode = "";
+					if (i < 6) colorCode = "\033[3" + to_string(i + 1) + ";1m";
+					else colorCode = "\033[3" + to_string(i - 5) + ";2m";
+
+					setTextColor(colorCode);
+					cout << "\tNhap toa do cua robot [" << i + 1 << ']' << '(' << sizeMatrix[0] << 'x' << sizeMatrix[1] << ") : ";
+					cin >> robotP[i].curPosY >> robotP[i].curPosX;
+
+					robotP[i].curPosX = robotP[i].curPosX - 1;
+					robotP[i].curPosY = robotP[i].curPosY - 1;
 
 					*val = arr[robotP[i].curPosY][robotP[i].curPosX].value;
 					arrFlag[robotP[i].curPosY][robotP[i].curPosX] = -1;
@@ -273,23 +314,32 @@ int main() {
 				};
 				delete val;
 
-				drawMatrix(arr, sizeMatrix[0], sizeMatrix[1], *maxLen, 20, 3 + amount);
+				setTextColor(RESET_COLOR);
+				drawMatrix(arr, sizeMatrix[0], sizeMatrix[1], *maxLen, 20, 3 + amount + 1);
 
 				if (virtualMode == true) {
 					for (int i = 0; i < amount; i++)
 					{
 						/*
-						(*maxLen * 2)*curCol: length of cell
+						(*maxLen + 3)*curCol: length of cell
 						20: position of matrix
-						1 + to_sttring(num).size(): set positino of text pointer
+						1 + to_sttring(num).size(): set position of text pointer
 						*/
 						drawX = (*maxLen + 3) * (robotP[i].curPosX + 1) + 20 - (1 + to_string(store[i][0]).size());
-						drawY = 2 * robotP[i].curPosY + 1 + 3 + amount;
+						/*
+						2*robotP[i].curPosY:two lines per row.
+						+1: because with array, the first element will have index is 0, so we increase 1
+						+4: amount of default line printed
+						*/
+						drawY = 2 * robotP[i].curPosY + 1 + 4 + amount;
 
-						string colorCode = "\033[3" + to_string(i + 1) + "m";
+						string colorCode = "";
+						if (i < 6) colorCode = "\033[3" + to_string(i + 1) + ";1m";
+						else colorCode = "\033[3" + to_string(i - 5) + ";2m";
 						markCell(drawX, drawY, colorCode, store[i][0]);
-					}
-				};
+					};
+				}
+				else setTextColor(RESET_COLOR);
 
 				while (true)
 				{
@@ -315,10 +365,13 @@ int main() {
 								if (virtualMode == true)
 								{
 									drawX = (*maxLen + 3) * (robotP[i].curPosX + 1) + 20 - (1 + to_string(temp.value).size());
-									drawY = 2 * robotP[i].curPosY + 1 + 3 + amount;
+									drawY = 2 * robotP[i].curPosY + 1 + 4 + amount;
 
-									string colorCode = "\033[3" + to_string(i + 1) + "m";
-									markCell(drawX, drawY, colorCode, temp.value);
+									string colorCode = "";
+									setTextColor(RESET_COLOR);
+									if (i < 6) colorCode = "\033[3" + to_string(i + 1) + ";1m";
+									else colorCode = "\033[3" + to_string(i - 5) + ";2m";
+									markCell(drawX, drawY, colorCode, store[i][store[i].size() - 1]);
 								};
 							}
 							else
@@ -340,18 +393,24 @@ int main() {
 				fileOutput.open("C:/Users/Lenovo/Desktop/output.txt");
 				for (int i = 0; i < amount; i++)
 				{
-					fileOutput << "Robot [" << i << ']' << robotP[i].amountCell << '\n';
+					fileOutput << "Robot [" << i << "]: " << robotP[i].amountCell << '\n';
 					for (int j = 0; j < store[i].size(); j++)
 					{
 						fileOutput << store[i][j] << ' ';
 					};
 					fileOutput << '\n';
+					fileOutput << '\n';
 				};
 				fileOutput.close();
 
 				cout << '\n';
-				gotoXY(0, 2 * sizeMatrix[0] + 1 + 3 + amount);
-				cout << "Ban co muon choi lai khong (y/n): ";
+				cout << '\n';
+
+				setTextColor(RESET_COLOR);
+
+				setTextColor(MAGENTA_COLOR);
+				gotoXY(0, 2 * sizeMatrix[0] + 1 + 6 + amount);
+				cout << "\tBan co muon choi lai khong (y/n): ";
 				char c = ' ';
 				cin >> c;
 				c = tolower(c);
@@ -374,13 +433,20 @@ int main() {
 			}
 			case 2: {
 				system("cls");
-				cout << "Che do mo phong:" << virtualMode << '\n';
+				setTextColor(RESET_COLOR);
+
+				setTextColor(GREEN_COLOR);
+				cout << "\tChe do mo phong:" << virtualMode << '\n';
 				char c = ' ';
 				if (!virtualMode)
 				{
-					cout << "Bat mo phong ?(y/n): ";
+					if (virtualMode == false) setTextColor(RED_COLOR);
+					cout << "\tBat mo phong ?(y/n): ";
 				}
-				else cout << " Tat mo phong ?(y/n): ";
+				else {
+					if (virtualMode == true) setTextColor(GREEN_COLOR);
+					cout << "\tTat mo phong ?(y/n): ";
+				}
 				cin >> c;
 				c = tolower(c);
 				if (c == 'y')
@@ -391,9 +457,14 @@ int main() {
 			}
 			case 3: {
 				system("cls");
+				setTextColor(RESET_COLOR);
+
+				setTextColor(YELLOW_COLOR);
 				drawMatrix(arr, sizeMatrix[0], sizeMatrix[1], *maxLen, 20, 3);
+
 				cout << '\n';
-				cout << "press 'b' to back!";
+				setTextColor(RED_COLOR);
+				cout << "\tpress 'b' to back!";
 				char* c = new char(' ');
 				while (true) {
 					if (_kbhit())
@@ -433,11 +504,40 @@ int main() {
 			}
 			case 5: {
 				system("cls");
+				cout << "\tSet your robot at any cell, then they will look for the max value (per cell around them) and step on it." << '\n';
+				cout << "\tThe search will stop if all connot find anymore." << '\n';
+				cout << '\n';
+
+				setTextColor(BRIGHT_RED);
+				cout << "\tDECRIPTION:" << '\n';
+				cout << "\t1. [AROUND THEM]:LEFT, RIGHT, UP, DOWN" << '\n';
+				cout << "\t2. One color per robot (if you turn on virtualMode)." << '\n';
+
+				cout << '\n';
+				cout << "\tpress 'b' to back!";
+				char* c = new char(' ');
+				while (true) {
+					if (_kbhit())
+					{
+						*c = _getch();
+						*c = tolower(*c);
+						if (*c == 'b')
+						{
+							delete c;
+							break;
+						}
+						else
+						{
+							delete c;
+							goto exit;
+						}
+					};
+				};
 				break;
 			}
 			default:
 				break;
-			}
+			};
 		};
 	};
 	exit:
