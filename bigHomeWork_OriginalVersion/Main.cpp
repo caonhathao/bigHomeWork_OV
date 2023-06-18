@@ -13,6 +13,7 @@
 #include<conio.h>
 #include<Windows.h>
 #include<random>
+#include<iomanip>
 
 #include"valGlobal.h"
 #include"control_console.h"
@@ -26,6 +27,9 @@ using std::ifstream;
 using std::string;
 using std::to_string;
 using std::vector;
+using std::getline;
+using std::setw;
+using std::setfill;
 #pragma endregion
 
 posRobot robot;
@@ -44,6 +48,9 @@ bool isElementExist(int i, int j);
 bool isStop(posRobot robot[], int& size);
 
 posElement nextStep(posElement a[4], int size);
+
+size_t generateRandNum();
+void filterNumber(int& posY, int& posX, string str);
 #pragma endregion
 
 #pragma region funcsFindWay
@@ -98,11 +105,11 @@ posElement nextStep(posElement a[4], int size) {
 
 #pragma region funsCheckEvent
 bool isElementExist(int posY, int posX) {
-	if (posY == -1 || posY == sizeMatrix[0])
+	if (posY <= -1 || posY >= sizeMatrix[0])
 	{
 		return false;
 	}
-	else if (posX == -1 || posX == sizeMatrix[1])
+	else if (posX <= -1 || posX >= sizeMatrix[1])
 	{
 		return false;
 	}
@@ -140,9 +147,45 @@ size_t generateRandNum() {
 	std::uniform_int_distribution<> dist(1, MAX);
 	return dist(generate);
 }
+void filterNumber(int& posY, int& posX, string str) {
+	str = str + ' ';
+	string num = "";
+	int index = 0;
+	posX = -1;
+	posY = -1;
+	for (size_t i = 0; i < str.size(); i++)
+	{
+		if (str[i] != ' ')
+		{
+			num = num + str[i];
+		}
+		else if (num.size() != 0 && str[i] == ' ')
+		{
+			index = i;
+			posY = stoi(num);
+			break;
+		};
+	};
+
+	num = "";
+	for (int i = index; i < str.size(); i++)
+	{
+		if (str[i] != ' ')
+		{
+			num = num + str[i];
+		}
+		else if (num.size() != 0 && str[i] == ' ')
+		{
+			posX = stoi(num);
+			break;
+		};
+	}
+}
 #pragma endregion
 
 int main() {
+	showCursor(true);
+
 	bool virtualMode = false;
 	bool createMap = false;
 	bool defaultMap = true;
@@ -241,7 +284,7 @@ int main() {
 			cout << '\n';
 
 			setTextColor(RED_COLOR);
-			cout << "\tpress 'b' to back!";
+			cout << "\tNhan phim 'b' de quay lai!";
 			char* c = new char(' ');
 			while (true) {
 				if (_kbhit())
@@ -252,11 +295,6 @@ int main() {
 					{
 						delete c;
 						break;
-					}
-					else
-					{
-						delete c;
-						goto exit;
 					}
 				};
 			};
@@ -301,12 +339,26 @@ int main() {
 					else colorCode = "\033[3" + to_string(i - 5) + ";2m";
 
 					setTextColor(colorCode);
-					cout << "\tNhap toa do cua robot [" << i + 1 << ']' << '(' << sizeMatrix[0] << 'x' << sizeMatrix[1] << ") : ";
-					cin >> robotP[i].curPosY >> robotP[i].curPosX;
+					string temp = "Nhap toa do cua robot [" + to_string(i + 1) + "](" + to_string(sizeMatrix[0]) + "x" + to_string(sizeMatrix[1]) + ") : ";
+					cout << '\t' << temp;
+
+					string str = " ";
+					while (!isElementExist(robotP[i].curPosY - 1,robotP[i].curPosX - 1))
+					{
+						gotoXY(7 + temp.size() + 1, i + 3);
+						cout << setfill(' ');
+						cout << setw(str.size()) << ' ';
+
+						gotoXY(7 + temp.size() + 1, i + 3);
+
+						getline(cin, str);
+
+						filterNumber(robotP[i].curPosY, robotP[i].curPosX, str);
+					}
 
 					robotP[i].curPosX = robotP[i].curPosX - 1;
 					robotP[i].curPosY = robotP[i].curPosY - 1;
-
+					
 					*val = arr[robotP[i].curPosY][robotP[i].curPosX].value;
 					arrFlag[robotP[i].curPosY][robotP[i].curPosX] = -1;
 
@@ -378,22 +430,26 @@ int main() {
 							{
 								robotP[i].stop = true;
 							};
+							if (virtualMode == true)
+							{
+								Sleep(500);
+							};
 						}
 					}
 					if (signal == true)
 					{
 						break;
 					}
-					if (virtualMode == true)
-					{
-						Sleep(200);
-					};
+					//if (virtualMode == true)
+					//{
+					//	Sleep(200);
+					//};
 				};
 
 				fileOutput.open("C:/Users/Lenovo/Desktop/output.txt");
 				for (int i = 0; i < amount; i++)
 				{
-					fileOutput << "Robot [" << i << "]: " << robotP[i].amountCell << '\n';
+					fileOutput << "Robot [" << i + 1<< "]: " << robotP[i].amountCell << '\n';
 					for (int j = 0; j < store[i].size(); j++)
 					{
 						fileOutput << store[i][j] << ' ';
@@ -435,8 +491,13 @@ int main() {
 				system("cls");
 				setTextColor(RESET_COLOR);
 
+				setTextColor(YELLOW_COLOR);
+				cout << "\t[==========][==========]" << '\n';
+
 				setTextColor(GREEN_COLOR);
-				cout << "\tChe do mo phong:" << virtualMode << '\n';
+				if (virtualMode) cout << "\tChe do mo phong: BAT" << '\n';
+				else cout << "\tChe do mo phong: TAT" << '\n';
+
 				char c = ' ';
 				if (!virtualMode)
 				{
@@ -464,7 +525,7 @@ int main() {
 
 				cout << '\n';
 				setTextColor(RED_COLOR);
-				cout << "\tpress 'b' to back!";
+				cout << "\tNhan phim 'b' de quay lai!";
 				char* c = new char(' ');
 				while (true) {
 					if (_kbhit())
@@ -504,17 +565,24 @@ int main() {
 			}
 			case 5: {
 				system("cls");
-				cout << "\tSet your robot at any cell, then they will look for the max value (per cell around them) and step on it." << '\n';
-				cout << "\tThe search will stop if all connot find anymore." << '\n';
-				cout << '\n';
-
-				setTextColor(BRIGHT_RED);
-				cout << "\tDECRIPTION:" << '\n';
-				cout << "\t1. [AROUND THEM]:LEFT, RIGHT, UP, DOWN" << '\n';
-				cout << "\t2. One color per robot (if you turn on virtualMode)." << '\n';
+				setTextColor(RESET_COLOR);
+				
+				setTextColor(GREEN_COLOR);
+				cout << "\tThiet lap vi tri robot cua ban (x,y) Sau do, chuong trinh se dieu khien con robot cua ban de tim duong di." << '\n';
 
 				cout << '\n';
-				cout << "\tpress 'b' to back!";
+				cout << "\tDuong di se duoc tim bang cach xem xet vung xung quanh robot va chon ra o co gia tri lon nhat.";
+				cout << "\Cuoc tim kiem se dung lai neu khong the tim ra diem den tiep theo" << '\n';
+				cout << '\n';
+
+				setTextColor(RED_COLOR);
+				cout << "\tCHU THICH:" << '\n';
+				cout << "\t1. VUNG XUNG QUANH: CAC O TREN, DUOI, TRAI, PHAI" << '\n';
+				cout << "\t2. MOT MAU SE DUOC GAN CHO MOI ROBOT (NEU CHE DO VIRTUALMODE DUOC BAT)." << '\n';
+
+				setTextColor(RED_COLOR);
+				cout << '\n';
+				cout << "\tNhan phim 'b' de quay lai!";
 				char* c = new char(' ');
 				while (true) {
 					if (_kbhit())
@@ -526,11 +594,6 @@ int main() {
 							delete c;
 							break;
 						}
-						else
-						{
-							delete c;
-							goto exit;
-						}
 					};
 				};
 				break;
@@ -539,7 +602,7 @@ int main() {
 				break;
 			};
 		};
-	};
+	}
 	exit:
 	return 0;
 }
