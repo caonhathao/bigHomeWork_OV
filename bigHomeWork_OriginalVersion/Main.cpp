@@ -325,7 +325,7 @@ int main() {
 				vector<int>* store = new vector<int>[amount] {};
 
 				setTextColor(GREEN_COLOR);
-				cout << "\tPlease enter the robot's position like as this form: [numRow][ ][numCol]" << '\n';
+				cout << "\tNhap vi tri cua robot theo mau sau: [numRow][ ][numCol]" << '\n';
 				cout << "\tnumRow >= numCol >= 1" << '\n';
 
 				setTextColor(RESET_COLOR);
@@ -363,6 +363,7 @@ int main() {
 					arrFlag[robotP[i].curPosY][robotP[i].curPosX] = -1;
 
 					store[i].push_back(*val);
+
 				};
 				delete val;
 
@@ -423,6 +424,12 @@ int main() {
 									setTextColor(RESET_COLOR);
 									if (i < 6) colorCode = "\033[3" + to_string(i + 1) + ";1m";
 									else colorCode = "\033[3" + to_string(i - 5) + ";2m";
+
+									gotoXY(5, 3 + i - 1);
+									cout << ' ';
+									gotoXY(5, 3 + i);
+									cout << '>';
+
 									markCell(drawX, drawY, colorCode, store[i][store[i].size() - 1]);
 								};
 							}
@@ -436,6 +443,8 @@ int main() {
 							};
 						}
 					}
+					gotoXY(5, 3 + amount - 1);
+					cout << ' ';
 					if (signal == true)
 					{
 						break;
@@ -571,7 +580,7 @@ int main() {
 				cout << "\tThiet lap vi tri robot cua ban (x,y) Sau do, chuong trinh se dieu khien con robot cua ban de tim duong di." << '\n';
 
 				cout << '\n';
-				cout << "\tDuong di se duoc tim bang cach xem xet vung xung quanh robot va chon ra o co gia tri lon nhat.";
+				cout << "\tDuong di se duoc tim bang cach xem xet vung xung quanh robot va chon ra o co gia tri lon nhat. ";
 				cout << "\Cuoc tim kiem se dung lai neu khong the tim ra diem den tiep theo" << '\n';
 				cout << '\n';
 

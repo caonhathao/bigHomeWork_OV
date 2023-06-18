@@ -13,6 +13,9 @@ void gotoXY(SHORT posX, SHORT posY);
 void showCursor(bool cursorVisibility);
 void setTextColor(const string& color);
 
+void setWindowSize(SHORT width, SHORT height);
+void setScreenBufferSize(SHORT width, SHORT height);
+
 //void setColor(int background_color, int text_color);
 
 /*
