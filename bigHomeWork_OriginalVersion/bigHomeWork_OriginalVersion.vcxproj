@@ -26,6 +26,7 @@
     <ClCompile Include="makeNewMap.cpp" />
     <ClCompile Include="markCell.cpp" />
     <ClCompile Include="playerChoice.cpp" />
+    <ClCompile Include="softRank.cpp" />
     <ClCompile Include="testing.cpp" />
     <ClCompile Include="valGlobal.cpp" />
     <ClCompile Include="welScreen.cpp" />

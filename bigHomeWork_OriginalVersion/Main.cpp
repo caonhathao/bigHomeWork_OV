@@ -35,6 +35,11 @@ using std::setfill;
 posRobot robot;
 posElement infoStep[4] = { 0 };
 int sizeMatrix[2] = {}; //[0]=row and [1]=cloumn
+int* maxLen = new int(0);
+int step = 0;
+vector<int>vc = {};
+
+posRobot R;
 
 #pragma region funcsDeclaration
 int playerChoice();//giao dien lua chon
@@ -42,7 +47,8 @@ int playerChoice();//giao dien lua chon
 void existAndPush(posRobot robot, int** arrFlag, posElement** arr, int& step);
 void drawMatrix(posElement** arr, int row, int col, int maxLen, int posX, int posY);
 void markCell(int posX, int posY, string colorCode, int num);
-//posElement** makeNewMap(int& row, int& col,int &maxlen);
+void drawSortRank(posRobot* arr, int &size, int &numRow);
+	//posElement** makeNewMap(int& row, int& col,int &maxlen);
 
 bool isElementExist(int i, int j);
 bool isStop(posRobot robot[], int& size);
@@ -53,7 +59,7 @@ size_t generateRandNum();
 void filterNumber(int& posY, int& posX, string str);
 #pragma endregion
 
-#pragma region funcsFindWay
+#pragma region funcsFindWayForPlayers
 void existAndPush(posRobot robot, int** arrFlag, posElement** arr, int& step) {
 	if (isElementExist(robot.curPosY - 1, robot.curPosX)) //up
 	{
@@ -103,6 +109,31 @@ posElement nextStep(posElement a[4], int size) {
 };
 #pragma endregion
 
+#pragma region funsFindWayForOne
+void explorePath(posElement** arr, int** arrFlag,int x, int y,int step) {
+	int drawX = (*maxLen + 3) * (x + 1) + 20 - (1 + to_string(arr[y][x].value).size());
+	int drawY = 2 * y + 6;
+	
+	markCell(drawX, drawY, "\033[32;1m", arr[y][x].value);
+
+	R.curPosX = x;
+	R.curPosY = y;
+	step = 0;
+	existAndPush(R, arrFlag, arr, step);
+	posElement temp = nextStep(infoStep, step);
+	if (temp.value == 0)
+	{
+		return;
+	}
+	else {
+		R.amountCell++;
+		arrFlag[y][x] = 1;
+		vc.push_back(temp.value);
+		Sleep(200);
+		explorePath(arr, arrFlag, temp.posX, temp.posY, step);
+	}
+}
+#pragma endregion
 #pragma region funsCheckEvent
 bool isElementExist(int posY, int posX) {
 	if (posY <= -1 || posY >= sizeMatrix[0])
@@ -114,7 +145,7 @@ bool isElementExist(int posY, int posX) {
 		return false;
 	}
 	return true;
-};
+}; 
 bool isStop(posRobot robot[], int& size) {
 	int countUp = 0;
 	for (int i = 0; i < size; i++)
@@ -189,9 +220,8 @@ int main() {
 	bool virtualMode = false;
 	bool createMap = false;
 	bool defaultMap = true;
-	int* maxLen = new int(0);
 
-	fstream fileOutput;
+	ofstream fileOutput;
 
 	while (true) {
 		setTextColor(RESET_COLOR);
@@ -362,6 +392,8 @@ int main() {
 					*val = arr[robotP[i].curPosY][robotP[i].curPosX].value;
 					arrFlag[robotP[i].curPosY][robotP[i].curPosX] = -1;
 
+					robotP[i].sumTotal = robotP[i].sumTotal + *val;
+
 					store[i].push_back(*val);
 
 				};
@@ -369,6 +401,51 @@ int main() {
 
 				setTextColor(RESET_COLOR);
 				drawMatrix(arr, sizeMatrix[0], sizeMatrix[1], *maxLen, 20, 3 + amount + 1);
+
+				//for one player
+				if (amount == 1) 
+				{
+					vc.push_back(arr[robotP[0].curPosY][robotP[0].curPosX].value);
+
+					explorePath(arr, arrFlag, robotP[0].curPosX, robotP[0].curPosY, step);
+					fileOutput.open("C:/Users/Lenovo/Desktop/output.txt");
+
+					fileOutput << "Robot [" << 1 << "]: " << R.amountCell << '\n';
+					for (int j = 0; j < vc.size(); j++)
+					{
+						fileOutput << vc[j] << ' ';
+					};
+					fileOutput << '\n';
+					fileOutput << '\n';
+
+					fileOutput.close();
+
+					cout << '\n';
+					cout << '\n';
+
+					setTextColor(RESET_COLOR);
+
+					drawSortRank(robotP, amount, sizeMatrix[0]);
+
+					setTextColor(MAGENTA_COLOR);
+					//gotoXY(0, 2 * sizeMatrix[0] + 1 + 6 + amount);
+					cout << "\tNhan phim 'b' de quay lai ";
+					char c = ' ';
+					cin >> c;
+					c = tolower(c);
+					if (c == 'b')
+					{
+						delete[]robotP;
+						delete[]store;
+
+						for (int i = 0; i < sizeMatrix[0]; i++)
+						{
+							delete[] arrFlag[i];
+						}
+						delete[] arrFlag;
+						break;
+					}
+				};
 
 				if (virtualMode == true) {
 					for (int i = 0; i < amount; i++)
@@ -399,9 +476,19 @@ int main() {
 					bool signal = isStop(robotP, amount);
 					for (int i = 0; i < amount; i++)
 					{
+						string colorCode = "";
+						setTextColor(RESET_COLOR);
+						if (i < 6) colorCode = "\033[3" + to_string(i + 1) + ";1m";
+						else colorCode = "\033[3" + to_string(i - 5) + ";2m";
+
+						gotoXY(4, 3 + i - 1);
+						cout << "  ";
+						gotoXY(4, 3 + i);
+						setTextColor(colorCode);
+						cout << ">>";
+
 						if (robotP[i].stop != true)
 						{
-							int step = 0;
 							existAndPush(robotP[i], arrFlag, arr, step);
 
 							posElement temp = nextStep(infoStep, step);
@@ -411,6 +498,7 @@ int main() {
 								robotP[i].curPosY = temp.posY;
 
 								robotP[i].amountCell++;
+								robotP[i].sumTotal = robotP[i].sumTotal + temp.value;
 
 								store[i].push_back(arr[temp.posY][temp.posX].value);
 								arrFlag[robotP[i].curPosY][robotP[i].curPosX] = -1;
@@ -419,16 +507,6 @@ int main() {
 								{
 									drawX = (*maxLen + 3) * (robotP[i].curPosX + 1) + 20 - (1 + to_string(temp.value).size());
 									drawY = 2 * robotP[i].curPosY + 1 + 4 + amount;
-
-									string colorCode = "";
-									setTextColor(RESET_COLOR);
-									if (i < 6) colorCode = "\033[3" + to_string(i + 1) + ";1m";
-									else colorCode = "\033[3" + to_string(i - 5) + ";2m";
-
-									gotoXY(5, 3 + i - 1);
-									cout << ' ';
-									gotoXY(5, 3 + i);
-									cout << '>';
 
 									markCell(drawX, drawY, colorCode, store[i][store[i].size() - 1]);
 								};
@@ -439,7 +517,7 @@ int main() {
 							};
 							if (virtualMode == true)
 							{
-								Sleep(500);
+								Sleep(250);
 							};
 						}
 					}
@@ -473,8 +551,10 @@ int main() {
 
 				setTextColor(RESET_COLOR);
 
+				drawSortRank(robotP, amount, sizeMatrix[0]);
+
 				setTextColor(MAGENTA_COLOR);
-				gotoXY(0, 2 * sizeMatrix[0] + 1 + 6 + amount);
+				//gotoXY(0, 2 * sizeMatrix[0] + 1 + 6 + amount);
 				cout << "\tBan co muon choi lai khong (y/n): ";
 				char c = ' ';
 				cin >> c;
@@ -584,10 +664,18 @@ int main() {
 				cout << "\Cuoc tim kiem se dung lai neu khong the tim ra diem den tiep theo" << '\n';
 				cout << '\n';
 
+				cout << "\tSo nguoi choi toi da la 10 nguoi.\n";
+				cout << '\n';
+
 				setTextColor(RED_COLOR);
 				cout << "\tCHU THICH:" << '\n';
 				cout << "\t1. VUNG XUNG QUANH: CAC O TREN, DUOI, TRAI, PHAI" << '\n';
 				cout << "\t2. MOT MAU SE DUOC GAN CHO MOI ROBOT (NEU CHE DO VIRTUALMODE DUOC BAT)." << '\n';
+
+				setTextColor(YELLOW_COLOR);
+				cout << "\tHE THONG XEP HANG:" << "\n";
+				cout << "\t1. SAP XEP THEO TONG SO O DI DUOC [TU LON NHAT DEN BE NHAT]." << "\n";
+				cout << "\t2. NEU NEU CO NHIEU HON 2 EOBOT CUNG SO O DI DUOC, TONG SO DIEM KIEM DUOC SE DUOC DEM DI SO SANH." << "\n";
 
 				setTextColor(RED_COLOR);
 				cout << '\n';

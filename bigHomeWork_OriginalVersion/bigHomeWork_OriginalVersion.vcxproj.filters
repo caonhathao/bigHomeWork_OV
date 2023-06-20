@@ -45,6 +45,9 @@
     <ClCompile Include="valGlobal.cpp">
       <Filter>Header Files</Filter>
     </ClCompile>
+    <ClCompile Include="softRank.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="control_console.h">

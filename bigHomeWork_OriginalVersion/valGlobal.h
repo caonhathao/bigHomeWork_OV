@@ -32,6 +32,8 @@ struct posRobot {
 	int curPosX = 0;
 	int curPosY = 0;
 	int amountCell = 1;
+
+	int sumTotal = 0;
 };
 #endif // !_VALGLOBAL_H_
 
