@@ -129,11 +129,13 @@ void explorePath(posElement** arr, int** arrFlag,int x, int y,int step) {
 		R.amountCell++;
 		arrFlag[y][x] = 1;
 		vc.push_back(temp.value);
+		R.sumTotal = R.sumTotal + temp.value;
 		Sleep(200);
 		explorePath(arr, arrFlag, temp.posX, temp.posY, step);
 	}
 }
 #pragma endregion
+
 #pragma region funsCheckEvent
 bool isElementExist(int posY, int posX) {
 	if (posY <= -1 || posY >= sizeMatrix[0])
@@ -408,6 +410,8 @@ int main() {
 					vc.push_back(arr[robotP[0].curPosY][robotP[0].curPosX].value);
 
 					explorePath(arr, arrFlag, robotP[0].curPosX, robotP[0].curPosY, step);
+					robotP[0].sumTotal = vc[0] + R.sumTotal;
+
 					fileOutput.open("C:/Users/Lenovo/Desktop/output.txt");
 
 					fileOutput << "Robot [" << 1 << "]: " << R.amountCell << '\n';
