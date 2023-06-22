@@ -35,5 +35,12 @@ struct posRobot {
 
 	int sumTotal = 0;
 };
+enum class Activities {
+	left,right,up,down
+};
+struct markVisuallize {
+	string character = "";
+	int marked = 0;
+};
 #endif // !_VALGLOBAL_H_
 
