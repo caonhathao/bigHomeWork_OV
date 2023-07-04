@@ -97,6 +97,9 @@ void saveVisualizeToFile(string pathFile, markVisuallize** arr,int row,int col, 
 			for (int z = 0; z < col; z++)
 			{
 				if (arr[k][z].marked == index)
+					if (arr[k][z].beginPos == true)
+						fileOutput << createLine("S", maxLen, z, z - countUp);
+					else
 					fileOutput << createLine(arr[k][z].character, maxLen, z, z - countUp);
 				else
 					fileOutput << createLine(".", maxLen, z, z - countUp);

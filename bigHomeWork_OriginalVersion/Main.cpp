@@ -39,14 +39,15 @@ posElement infoStep[4] = { 0 };
 Activities active;
 int sizeMatrix[2] = {}; //[0]=row and [1]=cloumn
 int* maxLen = new int(0);
+int amount = 0;
 int step = 0;
 
 #pragma region funcsDeclaration
 int playerChoice();//giao dien lua chon
 
-void existAndPush(posRobot robot, markVisuallize** arrFlag, posElement** arr, int& step, vector<Activities>& AC);
+void existAndPush(posRobot robot, markVisuallize** arrFlag, posElement** arr, int& step, vector<Activities>& AC,int index);
 void drawMatrix(posElement** arr, int row, int col, int maxLen, int posX, int posY);
-void markCell(int posX, int posY, string colorCode, int num);
+void markCell(int posX, int posY, string colorCode, int num, Activities ac);
 void drawSortRank(posRobot* arr, int &size, int &numRow);
 
 void saveVisualizeToFile(string pathFile, markVisuallize** arr, int row, int col, int maxLen, int index);
@@ -64,7 +65,7 @@ string direction(Activities ac);
 #pragma endregion
 
 #pragma region funcsFindWayForPlayers
-void existAndPush(posRobot robot, markVisuallize** arrFlag, posElement** arr, int& step, vector<Activities>& AC) {
+void existAndPush(posRobot robot, markVisuallize** arrFlag, posElement** arr, int& step, vector<Activities>& AC, int index) {//false if run case  3
 	step = 0;
 	if (isElementExist(robot.curPosY - 1, robot.curPosX)) //up
 	{
@@ -74,7 +75,7 @@ void existAndPush(posRobot robot, markVisuallize** arrFlag, posElement** arr, in
 			step++;
 			active = Activities::up;
 			AC.push_back(active);
-		}
+		};
 	}
 	if (isElementExist(robot.curPosY + 1, robot.curPosX)) //down
 	{
@@ -124,28 +125,37 @@ posElement nextStep(posElement a[4], int size,vector<Activities>ac) {
 #pragma endregion
 
 #pragma region funsFindWayForOne
-void explorePath(posElement** arr, markVisuallize** arrFlag,int x, int y,int step, vector<int> &vc, vector<Activities>&ac) {
-	int drawX = (*maxLen + 3) * (x + 1) + 20 - (1 + to_string(arr[y][x].value).size());
-	int drawY = 2 * y + 6;
-	
-	markCell(drawX, drawY, "\033[32;1m", arr[y][x].value);
-
+void explorePath(posElement** arr, markVisuallize** arrFlag,int x, int y,int step, vector<int> &vc, vector<Activities>&ac,int index) {
 	R.curPosX = x;
 	R.curPosY = y;
 	step = 0;
-	existAndPush(R, arrFlag, arr, step, ac);
+	ac.clear();
+	existAndPush(R, arrFlag, arr, step, ac, index);
 	posElement temp = nextStep(infoStep, step,ac);
 	if (temp.value == 0)
 	{
+		int drawX = (*maxLen + 3) * (x + 1) + 20 - (1 + to_string(arr[y][x].value).size());
+		int drawY = 2 * y + amount + 5;
+		string colorCode = "\033[3" + to_string(index) + ";1m";
+		arrFlag[y][x].marked = index;
+		active = Activities::stop;
+		arrFlag[y][x].character = "E";
+		markCell(drawX, drawY, colorCode, arr[y][x].value, active);
 		return;
 	}
 	else {
+		int drawX = (*maxLen + 3) * (x + 1) + 20 - (1 + to_string(arr[y][x].value).size());
+		int drawY = 2 * y + amount + 5;
+		string colorCode = "\033[3" + to_string(index) + ";1m";
+		markCell(drawX, drawY, colorCode, arr[y][x].value, active);
+
 		R.amountCell++;
-		arrFlag[y][x].marked = 1;
+		arrFlag[y][x].marked = index;
 		vc.push_back(temp.value);
 		R.sumTotal = R.sumTotal + temp.value;
+		arrFlag[y][x].character = direction(active);
 		Sleep(200);
-		explorePath(arr, arrFlag, temp.posX, temp.posY, step, vc, ac);
+		explorePath(arr, arrFlag, temp.posX, temp.posY, step, vc, ac,index);
 	}
 }
 #pragma endregion
@@ -247,7 +257,7 @@ string direction(Activities ac) {
 
 int main() {
 	showCursor(true);
-	SetConsoleOutputCP(65001);
+	SetConsoleOutputCP(CP_UTF8);
 
 	bool virtualMode = false;
 	bool createMap = false;
@@ -264,7 +274,7 @@ int main() {
 		int drawY = 0;
 		if (defaultMap == true)
 		{
-			ifstream fileInput("C:/Users/Lenovo/Desktop/input.txt");
+			ifstream fileInput("input.txt");
 
 			int i = 0, j = 0;
 
@@ -381,7 +391,6 @@ int main() {
 				system("cls");
 				setTextColor(YELLOW_COLOR);
 				cout << "\tXac nhan so nguoi choi: ";
-				int amount = 0;
 				cin >> amount;
 
 				posRobot* robotP = new posRobot[amount];
@@ -425,11 +434,13 @@ int main() {
 					
 					*val = arr[robotP[i].curPosY][robotP[i].curPosX].value;
 					arrFlag[robotP[i].curPosY][robotP[i].curPosX].marked = i + 1;
+					arrFlag[robotP[i].curPosY][robotP[i].curPosX].beginPos = true;
 
 					robotP[i].sumTotal = robotP[i].sumTotal + *val;
 
 					store[i].push_back(*val);
-
+					gotoXY(7 + temp.size() + str.size(), i + 3);
+					cout << "Cell's Value: " << *val;
 				};
 				delete val;
 
@@ -437,14 +448,18 @@ int main() {
 				drawMatrix(arr, sizeMatrix[0], sizeMatrix[1], *maxLen, 20, 3 + amount + 1);
 
 				//for one player
-				if (amount == 1)
+				if (amount == 1) //for case 2
 				{
+					fileOutput.open("output.txt");
+
 					vector<Activities>ac = {};
-					explorePath(arr, arrFlag, robotP[0].curPosX, robotP[0].curPosY, step, store[0], ac);
+					R.amountCell = 1;
+					R.sumTotal = 0;
+					explorePath(arr, arrFlag, robotP[0].curPosX, robotP[0].curPosY, step, store[0], ac, 1);
 					robotP[0].sumTotal = store[0][0] + R.sumTotal;
 					robotP[0].amountCell = R.amountCell;
 
-					fileOutput.open("C:/Users/Lenovo/Desktop/output.txt");
+					cout << "\n";
 
 					fileOutput << "Robot [" << 1 << "]: " << R.amountCell << '\n';
 					for (int j = 0; j < store[0].size(); j++)
@@ -455,6 +470,8 @@ int main() {
 					fileOutput << '\n';
 
 					fileOutput.close();
+
+					saveVisualizeToFile("output.txt", arrFlag, sizeMatrix[0], sizeMatrix[1], *maxLen, 1);
 
 					cout << '\n';
 					cout << '\n';
@@ -488,29 +505,9 @@ int main() {
 					};
 				}
 				else {
-					if (virtualMode == true) {
-						for (int i = 0; i < amount; i++)
-						{
-							/*
-							(*maxLen + 3)*curCol: length of cell
-							20: position of matrix
-							1 + to_sttring(num).size(): set position of text pointer
-							*/
-							drawX = (*maxLen + 3) * (robotP[i].curPosX + 1) + 20 - (1 + to_string(store[i][0]).size());
-							/*
-							2*robotP[i].curPosY:two lines per row.
-							+1: because with array, the first element will have index is 0, so we increase 1
-							+4: amount of default line printed
-							*/
-							drawY = 2 * robotP[i].curPosY + 1 + 4 + amount;
+					active = Activities::stop;
 
-							string colorCode = "";
-							if (i < 6) colorCode = "\033[3" + to_string(i + 1) + ";1m";
-							else colorCode = "\033[3" + to_string(i - 5) + ";2m";
-							markCell(drawX, drawY, colorCode, store[i][0]);
-						};
-					}
-					else setTextColor(RESET_COLOR);
+					setTextColor(RESET_COLOR);
 					vector<Activities>ac = {};
 					while (true)
 					{
@@ -529,11 +526,19 @@ int main() {
 
 							if (robotP[i].stop != true)
 							{
-								existAndPush(robotP[i], arrFlag, arr, step, ac);
+								existAndPush(robotP[i], arrFlag, arr, step, ac, 0);
 
 								posElement temp = nextStep(infoStep, step, ac);
 								if (temp.value != 0)
 								{
+									if (virtualMode == true)
+									{
+										int val = arr[robotP[i].curPosY][robotP[i].curPosX].value;
+										drawX = (*maxLen + 3) * ((robotP[i].curPosX) + 1) + 20 - (1 + to_string(val).size());
+										drawY = 2 * robotP[i].curPosY + 5 + amount;
+
+										markCell(drawX, drawY, colorCode, store[i][store[i].size() - 1], active);
+									};
 									arrFlag[robotP[i].curPosY][robotP[i].curPosX].character = direction(active);
 
 									robotP[i].curPosX = temp.posX;
@@ -544,19 +549,21 @@ int main() {
 
 									store[i].push_back(arr[temp.posY][temp.posX].value);
 									arrFlag[robotP[i].curPosY][robotP[i].curPosX].marked = i + 1;
-
-									if (virtualMode == true)
-									{
-										drawX = (*maxLen + 3) * (robotP[i].curPosX + 1) + 20 - (1 + to_string(temp.value).size());
-										drawY = 2 * robotP[i].curPosY + 1 + 4 + amount;
-
-										markCell(drawX, drawY, colorCode, store[i][store[i].size() - 1]);
-									};
 								}
 								else
 								{
+									if (virtualMode == true)
+									{
+										active = Activities::stop;
+										int val = arr[robotP[i].curPosY][robotP[i].curPosX].value;
+
+										drawX = (*maxLen + 3) * ((robotP[i].curPosX) + 1) + 20 - (1 + to_string(val).size());
+										drawY = 2 * robotP[i].curPosY + 5 + amount;
+
+										markCell(drawX, drawY, colorCode, store[i][store[i].size() - 1], active);
+									};
 									robotP[i].stop = true;
-									arrFlag[robotP[i].curPosY][robotP[i].curPosX].character = 'E';
+									arrFlag[robotP[i].curPosY][robotP[i].curPosX].character = "E";
 								};
 								if (virtualMode == true)
 								{
@@ -572,18 +579,14 @@ int main() {
 						{
 							break;
 						}
-						//if (virtualMode == true)
-						//{
-						//	Sleep(200);
-						//};
 					};
 
-					fileOutput.open("C:/Users/Lenovo/Desktop/output.txt", ios::out);
+					fileOutput.open("output.txt", ios::out);
 					fileOutput.close();
 
 					for (int i = 0; i < amount; i++)
 					{
-						fileOutput.open("C:/Users/Lenovo/Desktop/output.txt", ios::app);
+						fileOutput.open("output.txt", ios::app);
 						fileOutput << "Robot [" << i + 1 << "]: " << robotP[i].amountCell << '\n';
 						for (int j = 0; j < store[i].size(); j++)
 						{
@@ -593,8 +596,9 @@ int main() {
 						fileOutput << '\n';
 
 						fileOutput.close();
-						saveVisualizeToFile("C:/Users/Lenovo/Desktop/output.txt", arrFlag, sizeMatrix[0], sizeMatrix[1], *maxLen, i + 1);
+						saveVisualizeToFile("output.txt", arrFlag, sizeMatrix[0], sizeMatrix[1], *maxLen, i + 1);
 					};
+					
 					fileOutput.close();
 
 					cout << '\n';
@@ -728,7 +732,7 @@ int main() {
 				setTextColor(YELLOW_COLOR);
 				cout << "\tHE THONG XEP HANG:" << "\n";
 				cout << "\t1. SAP XEP THEO TONG SO O DI DUOC [TU LON NHAT DEN BE NHAT]." << "\n";
-				cout << "\t2. NEU NEU CO NHIEU HON 2 EOBOT CUNG SO O DI DUOC, TONG SO DIEM KIEM DUOC SE DUOC DEM DI SO SANH." << "\n";
+				cout << "\t2. NEU CO NHIEU HON 2 ROBOT CUNG SO O DI DUOC, TONG SO DIEM KIEM DUOC SE DUOC DEM DI SO SANH." << "\n";
 
 				setTextColor(RED_COLOR);
 				cout << '\n';
@@ -753,7 +757,7 @@ int main() {
 			};
 		};
 	}
-exit:
+	exit:
 	delete maxLen;
 	return 0;
-}
+};;

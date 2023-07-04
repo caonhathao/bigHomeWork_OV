@@ -36,11 +36,12 @@ struct posRobot {
 	int sumTotal = 0;
 };
 enum class Activities {
-	left,right,up,down
+	left,right,up,down,stop
 };
 struct markVisuallize {
 	string character = "";
 	int marked = 0;
+	bool beginPos = false;
 };
 #endif // !_VALGLOBAL_H_
 
