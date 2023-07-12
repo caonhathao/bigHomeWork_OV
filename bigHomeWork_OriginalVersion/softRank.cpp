@@ -17,7 +17,7 @@ void drawSortRank(posRobot* arr, int &size, int &numRow) {
 
 	for (int i = 0; i < size; i++)
 	{
-		sP[i].serial = i;
+		sP[i].serial = i + 1;
 		sP[i].amountCell = arr[i].amountCell;
 		sP[i].sumTotal = arr[i].sumTotal;
 	};

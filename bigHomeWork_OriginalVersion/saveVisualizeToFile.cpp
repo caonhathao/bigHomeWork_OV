@@ -2,8 +2,6 @@
 #include<iomanip>
 #include<fstream>
 #include<Windows.h>
-#include<fcntl.h>
-#include<io.h>
 #include"valGlobal.h"
 
 using std::cout;
@@ -11,63 +9,73 @@ using std::ofstream;
 using std::setw;
 using std::ios;
 
-string createLine(string c, int maxLen, int compesation1,int compesation2) {
-	string temp;
+/*
+* When write date from program to file .txt:
+*	- With the number from 0 to 9 and the character from 'A' to 'Z': the length is 1.5 spaces
+*		=> 2 spaces.
+*	- With the character from 'a' to 'z': the length is 1 spaces.
+*/
 
-	temp = temp + " | ";
-	int count = 0;
-	if (c == u8"\u2190" || c == u8"\u2192")
-		count = 3;
-	else if (c == u8"\u2191" || c == u8"\u2193")
-		count = 1;
-	else if (c == ".")
-		count = 0;
-	else 
-		count = 2;
-
-	for (int i = 0; i < maxLen-count; i++)
-		temp = temp + " ";
-
-	if (count == 1)
-		if (compesation1 > 1) {
-			temp = temp + c; int f = 0;
-			if (compesation2 > 2 && compesation2 <= 5)
+string createContentCell(string c, int maxLen) {
+	string temp = " | ";
+	int sizeCharacter = 0;
+	if (c.size() == 1)
+	{
+		if (c[0] >= '2' && c[0] <= '9' || c[0] == '0')
+		{
+			for (int i = 0; i < (maxLen * 2) - 2; i++)
 			{
-				f = 1;
-			}
-			else if (compesation2 > 5)
+				temp = temp + " ";
+			};
+			temp = temp + c + " ";
+			return temp;
+		}
+		else if (c[0] == '1')
+		{
+			for (int i = 0; i < ((maxLen - 2) * 2); i++)
 			{
-				f = 0;
-			}
-			else f = 2;
-			for (int i = 0; i < f; i++)
+				temp = temp + " ";
+			};
+			temp = temp + c + " ";
+			return temp;
+		}
+		else if (c[0] == 'S' || c[0] == 'E')
+		{
+			for (int i = 0; i < (maxLen - 1) * 2; i++)
 			{
 				temp = temp + " ";
 			}
+			temp = temp + c + " ";
+			return temp;
 		}
-		else temp = temp + c + " ";
-	else if (count == 2)
-		temp = temp + c + "  ";
-	else
-		if (compesation1 > 1) {
+		else
+		{
+			for (int i = 0; i < ((maxLen - 1) * 2); i++)
+			{
+				temp = temp + " ";
+			};
 			temp = temp + c;
-			int f = 0;
-			if (compesation2 > 3 && compesation2 <= 5)
-			{
-				f = 1;
-			}
-			else if (compesation2 > 5)
-			{
-				f = 0;
-			}
-			else f = 2;
-			for (int i = 0; i < f; i++)
-			{
-				temp = temp + " ";
-			}
+			return temp;
 		}
-		else temp = temp + c + " ";
-	return temp;
+	}
+	else
+	{
+		int sizeCharacter = 0;
+		for (int i = 0; i < c.size(); i++)
+		{
+			if (c[i] == '1')
+			{
+				sizeCharacter++;
+			}
+			else sizeCharacter += 2;
+		};
+		for (int i = 0; i < (maxLen * 2) - sizeCharacter - 1; i++)
+		{
+			temp = temp + " ";
+		};
+		temp = temp + c + " ";
+		return temp;
+	};
 }
 void saveVisualizeToFile(string pathFile, markVisuallize** arr,int row,int col, int maxLen,int index) {
 	int k = 0;
@@ -93,17 +101,16 @@ void saveVisualizeToFile(string pathFile, markVisuallize** arr,int row,int col, 
 		}
 		else
 		{
-			int countUp = 0;
 			for (int z = 0; z < col; z++)
 			{
 				if (arr[k][z].marked == index)
-					if (arr[k][z].beginPos == true)
-						fileOutput << createLine("S", maxLen, z, z - countUp);
-					else
-					fileOutput << createLine(arr[k][z].character, maxLen, z, z - countUp);
+				{
+					fileOutput << createContentCell(arr[k][z].character, maxLen);
+				}
 				else
-					fileOutput << createLine(".", maxLen, z, z - countUp);
-				countUp++;
+				{
+					fileOutput << createContentCell(" ", maxLen);
+				}
 			};
 			fileOutput << " |" << '\n';
 			k++;

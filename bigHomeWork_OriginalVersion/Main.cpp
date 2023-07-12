@@ -153,10 +153,11 @@ void explorePath(posElement** arr, markVisuallize** arrFlag,int x, int y,int ste
 		arrFlag[y][x].marked = index;
 		vc.push_back(temp.value);
 		R.sumTotal = R.sumTotal + temp.value;
-		arrFlag[y][x].character = direction(active);
+		if (vc.size() > 2) arrFlag[y][x].character = to_string(vc.size() - 1);
 		Sleep(200);
-		explorePath(arr, arrFlag, temp.posX, temp.posY, step, vc, ac,index);
-	}
+
+		explorePath(arr, arrFlag, temp.posX, temp.posY, step, vc, ac, index);
+	};
 }
 #pragma endregion
 
@@ -335,6 +336,7 @@ int main() {
 
 			cout << '\n';
 			cout << "\tDang tao moi..." << '\n';
+
 			arr = new posElement * [sizeMatrix[0]];
 			for (int i = 0; i < sizeMatrix[0]; i++)
 			{
@@ -414,7 +416,7 @@ int main() {
 					string temp = "Nhap toa do cua robot [" + to_string(i + 1) + "](" + to_string(sizeMatrix[0]) + "x" + to_string(sizeMatrix[1]) + ") : ";
 					cout << '\t' << temp;
 
-					string str = " ";
+					string str = "";
 					//enter position
 					while (!isElementExist(robotP[i].curPosY - 1,robotP[i].curPosX - 1))
 					{
@@ -434,12 +436,13 @@ int main() {
 					
 					*val = arr[robotP[i].curPosY][robotP[i].curPosX].value;
 					arrFlag[robotP[i].curPosY][robotP[i].curPosX].marked = i + 1;
+					arrFlag[robotP[i].curPosY][robotP[i].curPosX].character = "S";
 					arrFlag[robotP[i].curPosY][robotP[i].curPosX].beginPos = true;
 
 					robotP[i].sumTotal = robotP[i].sumTotal + *val;
 
 					store[i].push_back(*val);
-					gotoXY(7 + temp.size() + str.size(), i + 3);
+					gotoXY(7 + temp.size() + str.size() + 1, i + 3);
 					cout << "Cell's Value: " << *val;
 				};
 				delete val;
@@ -448,7 +451,7 @@ int main() {
 				drawMatrix(arr, sizeMatrix[0], sizeMatrix[1], *maxLen, 20, 3 + amount + 1);
 
 				//for one player
-				if (amount == 1) //for case 2
+				if (amount == 1) 
 				{
 					fileOutput.open("output.txt");
 
@@ -539,7 +542,7 @@ int main() {
 
 										markCell(drawX, drawY, colorCode, store[i][store[i].size() - 1], active);
 									};
-									arrFlag[robotP[i].curPosY][robotP[i].curPosX].character = direction(active);
+									arrFlag[robotP[i].curPosY][robotP[i].curPosX].character = to_string(store[i].size() - 1);
 
 									robotP[i].curPosX = temp.posX;
 									robotP[i].curPosY = temp.posY;
@@ -760,4 +763,4 @@ int main() {
 	exit:
 	delete maxLen;
 	return 0;
-};;
+};
